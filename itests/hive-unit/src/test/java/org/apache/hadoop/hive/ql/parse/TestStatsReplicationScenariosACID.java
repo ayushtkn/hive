@@ -30,7 +30,6 @@ import java.util.Map;
 /**
  * Tests statistics replication for ACID tables.
  */
-@org.junit.Ignore("HIVE-23924")
 public class TestStatsReplicationScenariosACID extends TestStatsReplicationScenarios {
   @Rule
   public final TestName testName = new TestName();
@@ -45,6 +44,7 @@ public class TestStatsReplicationScenariosACID extends TestStatsReplicationScena
               "org.apache.hadoop.hive.ql.lockmgr.DbTxnManager");
     overrides.put(MetastoreConf.ConfVars.CAPABILITY_CHECK.getHiveName(), "false");
     overrides.put(HiveConf.ConfVars.REPL_BOOTSTRAP_DUMP_OPEN_TXN_TIMEOUT.varname, "1s");
+    overrides.put(MetastoreConf.ConfVars.TXN_OPENTXN_TIMEOUT.getVarname(), "2000");
 
     internalBeforeClassSetup(overrides, overrides, TestStatsReplicationScenariosACID.class, true,
             AcidTableKind.FULL_ACID);
