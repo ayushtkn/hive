@@ -235,10 +235,7 @@ public class WarehouseInstance implements Closeable {
       driver.run(command);
       return this;
     } catch (CommandProcessorException e) {
-      if (e.getCause() != null) {
-        throw  e.getCause();
-      }
-      throw e;
+      throw e.getCause();
     }
   }
 
