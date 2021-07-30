@@ -18,6 +18,8 @@
 
 package org.apache.hadoop.hive.ql;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -387,6 +389,12 @@ public class Executor {
 
       // 08S01 (Communication error) is the default sql state.  Override the sqlstate
       // based on the ErrorMsg set in HiveException.
+      LOG.error("Task Error is ", result.getTaskError());
+      LOG.error("Task Error is ", result.getTaskError().getCause());
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      result.getTaskError().printStackTrace(pw);
+      LOG.error("Task Error is trace is {}", pw.toString());
       if (result.getTaskError() instanceof HiveException) {
         ErrorMsg errorMsg = ((HiveException) result.getTaskError()).
             getCanonicalErrorMsg();
@@ -408,6 +416,7 @@ public class Executor {
   private String getErrorMsgAndDetail(int exitVal, Throwable downstreamError, Task<?> task) {
     String errorMessage = "FAILED: Execution Error, return code " + exitVal + " from " + task.getClass().getName();
     if (downstreamError != null) {
+      LOG.error("Error is Ayush", downstreamError);
       //here we assume that upstream code may have parametrized the msg from ErrorMsg so we want to keep it
       if (downstreamError.getMessage() != null) {
         errorMessage += ". " + downstreamError.getMessage();

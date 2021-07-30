@@ -37,7 +37,7 @@ public class TaskResult {
     this.exitVal = exitVal;
     setRunning(false);
   }
-  public void setTaskError(Throwable taskError) {
+  public synchronized void  setTaskError(Throwable taskError) {
     this.taskError = taskError;
   }
   public void setExitVal(int exitVal, Throwable taskError) {
@@ -52,7 +52,7 @@ public class TaskResult {
   /**
    * @return may contain details of the error which caused the task to fail or null
    */
-  public Throwable getTaskError() {
+  public synchronized Throwable getTaskError() {
     return taskError;
   }
   public boolean isRunning() {

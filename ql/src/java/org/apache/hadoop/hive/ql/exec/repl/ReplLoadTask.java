@@ -163,6 +163,7 @@ public class ReplLoadTask extends Task<ReplLoadWork> implements Serializable {
       }
       throw e;
     } catch (Exception e) {
+      LOG.error("Replication Error Ayush", e);
       setException(e);
       int errorCode = ErrorMsg.getErrorMsg(e.getMessage()).getErrorCode();
       try {
