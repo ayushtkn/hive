@@ -145,11 +145,14 @@ public final class DriverUtils {
 
   public static CommandProcessorException createProcessorException(DriverContext driverContext, int ret,
       String errorMessage, String sqlState, Throwable downstreamError) {
+    LOG.error("Error Message: {}, sqlState {}, ret{}, DownStream error: ", errorMessage, sqlState, ret,
+        downstreamError);
     SessionState.getPerfLogger().cleanupPerfLogMetrics();
     driverContext.getQueryDisplay().setErrorMessage(errorMessage);
     if (downstreamError != null && downstreamError instanceof HiveException) {
       ErrorMsg em = ((HiveException)downstreamError).getCanonicalErrorMsg();
       if (em != null) {
+        LOG.error("Em is {}", em, downstreamError);
         return new CommandProcessorException(ret, em.getErrorCode(), errorMessage, sqlState, downstreamError);
       }
     }
