@@ -1,0 +1,79 @@
+PREHOOK: query: CREATE TABLE earthquakes (earthquake_date STRING, latitude DOUBLE, longitude DOUBLE, depth DOUBLE, magnitude DOUBLE,
+  magtype string, mbstations string, gap string, distance string, rms string, source string, eventid string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@earthquakes
+POSTHOOK: query: CREATE TABLE earthquakes (earthquake_date STRING, latitude DOUBLE, longitude DOUBLE, depth DOUBLE, magnitude DOUBLE,
+  magtype string, mbstations string, gap string, distance string, rms string, source string, eventid string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@earthquakes
+PREHOOK: query: CREATE TABLE counties (Area string, Perimeter string, State string, County string, Name string, BoundaryShape binary)
+ROW FORMAT SERDE 'com.esri.hadoop.hive.serde.EsriJsonSerDe'
+STORED AS INPUTFORMAT 'com.esri.json.hadoop.EnclosedEsriJsonInputFormat'
+OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@counties
+POSTHOOK: query: CREATE TABLE counties (Area string, Perimeter string, State string, County string, Name string, BoundaryShape binary)
+ROW FORMAT SERDE 'com.esri.hadoop.hive.serde.EsriJsonSerDe'
+STORED AS INPUTFORMAT 'com.esri.json.hadoop.EnclosedEsriJsonInputFormat'
+OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@counties
+PREHOOK: query: load data local inpath "../../data/files/earthquakes.csv" OVERWRITE INTO TABLE earthquakes
+PREHOOK: type: LOAD
+#### A masked pattern was here ####
+PREHOOK: Output: default@earthquakes
+POSTHOOK: query: load data local inpath "../../data/files/earthquakes.csv" OVERWRITE INTO TABLE earthquakes
+POSTHOOK: type: LOAD
+#### A masked pattern was here ####
+POSTHOOK: Output: default@earthquakes
+PREHOOK: query: load data local inpath "../../data/files/california-counties.json"  OVERWRITE INTO TABLE counties
+PREHOOK: type: LOAD
+#### A masked pattern was here ####
+PREHOOK: Output: default@counties
+POSTHOOK: query: load data local inpath "../../data/files/california-counties.json"  OVERWRITE INTO TABLE counties
+POSTHOOK: type: LOAD
+#### A masked pattern was here ####
+POSTHOOK: Output: default@counties
+Warning: Shuffle Join MERGEJOIN[15][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
+PREHOOK: query: SELECT counties.name, count(*) cnt FROM counties
+JOIN earthquakes
+WHERE ST_Contains(counties.boundaryshape, ST_Point(earthquakes.longitude, earthquakes.latitude))
+GROUP BY counties.name
+ORDER BY cnt desc
+PREHOOK: type: QUERY
+PREHOOK: Input: default@counties
+PREHOOK: Input: default@earthquakes
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT counties.name, count(*) cnt FROM counties
+JOIN earthquakes
+WHERE ST_Contains(counties.boundaryshape, ST_Point(earthquakes.longitude, earthquakes.latitude))
+GROUP BY counties.name
+ORDER BY cnt desc
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@counties
+POSTHOOK: Input: default@earthquakes
+#### A masked pattern was here ####
+Kern	36
+San Bernardino	35
+Imperial	28
+Inyo	20
+Los Angeles	18
+Riverside	14
+Monterey	14
+Santa Clara	12
+Fresno	11
+San Benito	11
+San Diego	7
+Santa Cruz	5
+San Luis Obispo	3
+Ventura	3
+Orange	2
+San Mateo	1
