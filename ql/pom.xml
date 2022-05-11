@@ -1093,7 +1093,7 @@
                 </relocation>
                 <relocation>
                   <pattern>com.fasterxml.jackson</pattern>
-                  <shadedPattern>org.apache.hive.com.fasterxml.jackson</shadedPattern>
+                  <shadedPattern>com.fasterxml.jackson</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>com.codahale.metrics</pattern>

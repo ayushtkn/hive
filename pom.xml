@@ -1676,6 +1676,9 @@
             <exclude>**/test/resources/**/*.ldif</exclude>
             <exclude>hcatalog/core/mapred/**/part-m*</exclude>
             <exclude>hcatalog/core/mapred/**/*_SUCCESS*</exclude>
+            <exclude>**/ql/src/test/hadoop/*json</exclude>
+            <exclude>**/ql/src/test/hadoop/**/*.json</exclude>
+            <exclude>**/*json</exclude>
           </excludes>
         </configuration>
       </plugin>
