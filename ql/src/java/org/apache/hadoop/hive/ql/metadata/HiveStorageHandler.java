@@ -246,6 +246,13 @@ public interface HiveStorageHandler extends Configurable {
   }
 
   /**
+   * Check if the storage handler supports load data .
+   * @return true if the storage handler can support load data
+   */
+  default boolean supportsLoadData() {
+    return false;
+  }
+  /**
    * Check if CTAS and CMV operations should behave in a direct-insert manner (i.e. no move task).
    * <p>
    * Please note that the atomicity of the operation will suffer in this case, i.e. the created table might become

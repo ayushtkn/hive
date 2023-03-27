@@ -294,6 +294,11 @@ public class LoadSemanticAnalyzer extends SemanticAnalyzer {
       throw new SemanticException(ErrorMsg.DML_AGAINST_VIEW.getMsg());
     }
     if (ts.tableHandle.isNonNative()) {
+      // launch a tez job
+      if (ts.tableHandle.getStorageHandler().supportsLoadData()) {
+        reparseAndSuperAnalyze(ts.tableHandle, fromURI);
+        return;
+      }
       throw new SemanticException(ErrorMsg.LOAD_INTO_NON_NATIVE.getMsg());
     }
 
@@ -456,6 +461,8 @@ public class LoadSemanticAnalyzer extends SemanticAnalyzer {
 
     // Set data location and input format, it must be text
     tempTableObj.setDataLocation(new Path(fromURI));
+    inputFormatClassName = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat";
+    serDeClassName = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe";
     if (inputFormatClassName != null && serDeClassName != null) {
       try {
         tempTableObj.setInputFormatClass(inputFormatClassName);

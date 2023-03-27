@@ -313,6 +313,11 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   }
 
   @Override
+  public boolean supportsLoadData() {
+    return true;
+  }
+
+  @Override
   public Map<String, String> getBasicStatistics(Partish partish) {
     org.apache.hadoop.hive.ql.metadata.Table hmsTable = partish.getTable();
     TableDesc tableDesc = Utilities.getTableDesc(hmsTable);

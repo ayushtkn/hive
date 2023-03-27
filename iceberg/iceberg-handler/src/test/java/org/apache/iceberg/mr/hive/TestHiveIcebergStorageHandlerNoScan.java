@@ -1796,6 +1796,15 @@ public class TestHiveIcebergStorageHandlerNoScan {
     Assert.assertEquals(sourceTable.schema().toString(), targetIcebergTable.schema().toString());
   }
 
+  @Test
+  public void testLoadData() {
+    TableIdentifier targetIdentifier = TableIdentifier.of("default", "target");
+    // Create iceberg table
+    shell.executeStatement(
+        "CREATE EXTERNAL TABLE target STORED BY ICEBERG " + testTables.locationForCreateTableSQL(targetIdentifier));
+
+  }
+
 
   /**
    * Checks that the new schema has newintcol and newstring col columns on both HMS and Iceberg sides
