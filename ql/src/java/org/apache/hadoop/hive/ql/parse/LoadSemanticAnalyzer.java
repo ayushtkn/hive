@@ -41,6 +41,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.StrictChecks;
 import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.QueryState;
@@ -50,6 +51,7 @@ import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.io.HiveFileFormatUtils;
+import org.apache.hadoop.hive.ql.io.StorageFormatDescriptor;
 import org.apache.hadoop.hive.ql.lockmgr.LockException;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -61,6 +63,7 @@ import org.apache.hadoop.hive.ql.plan.LoadTableDesc.LoadFileType;
 import org.apache.hadoop.hive.ql.plan.MoveWork;
 import org.apache.hadoop.hive.ql.plan.StatsWork;
 import org.apache.hadoop.mapred.InputFormat;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,11 +241,15 @@ public class LoadSemanticAnalyzer extends SemanticAnalyzer {
     if (ctx.getTempTableForLoad() != null) {
       super.analyzeInternal(ast);
     } else {
-      analyzeLoad(ast);
+      try {
+        analyzeLoad(ast);
+      } catch (HiveException | TException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 
-  private void analyzeLoad(ASTNode ast) throws SemanticException {
+  private void analyzeLoad(ASTNode ast) throws HiveException, TException {
     fromTree = ast.getChild(0);
     tableTree = ast.getChild(1);
 
@@ -295,8 +302,11 @@ public class LoadSemanticAnalyzer extends SemanticAnalyzer {
     }
     if (ts.tableHandle.isNonNative()) {
       // launch a tez job
-      if (ts.tableHandle.getStorageHandler().supportsLoadData()) {
-        reparseAndSuperAnalyze(ts.tableHandle, fromURI);
+      StorageFormatDescriptor ss =
+          ts.tableHandle.getStorageHandler().supportsLoadData(ts.tableHandle.getTTable(), fromURI);
+      if (ss != null) {
+        inputFormatClassName = ss.getInputFormat();
+        serDeClassName = ss.getSerde();
         return;
       }
       throw new SemanticException(ErrorMsg.LOAD_INTO_NON_NATIVE.getMsg());

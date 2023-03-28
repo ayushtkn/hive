@@ -47,6 +47,7 @@ import org.apache.hadoop.hive.metastore.api.EnvironmentContext;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.LockType;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
+import org.apache.hadoop.hive.metastore.partition.spec.PartitionSpecProxy;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.Context.Operation;
 import org.apache.hadoop.hive.ql.ddl.table.AbstractAlterTableDesc;
@@ -56,9 +57,11 @@ import org.apache.hadoop.hive.ql.ddl.table.misc.properties.AlterTableSetProperti
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
+import org.apache.hadoop.hive.ql.io.StorageFormatDescriptor;
 import org.apache.hadoop.hive.ql.io.parquet.vector.VectorizedParquetRecordReader;
 import org.apache.hadoop.hive.ql.io.sarg.ConvertAstToSearchArg;
 import org.apache.hadoop.hive.ql.io.sarg.SearchArgument;
+import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.HiveStoragePredicateHandler;
@@ -66,6 +69,7 @@ import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.hive.ql.parse.AlterTableExecuteSpec;
 import org.apache.hadoop.hive.ql.parse.PartitionTransform;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.parse.StorageFormat;
 import org.apache.hadoop.hive.ql.parse.TransformSpec;
 import org.apache.hadoop.hive.ql.plan.DynamicPartitionCtx;
 import org.apache.hadoop.hive.ql.plan.ExprNodeColumnDesc;
@@ -122,6 +126,7 @@ import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 import org.apache.iceberg.relocated.com.google.common.collect.Sets;
 import org.apache.iceberg.types.Types;
 import org.apache.iceberg.util.SerializationUtil;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -313,15 +318,26 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   }
 
   @Override
-  public boolean supportsLoadData() {
-    return true;
+  public StorageFormatDescriptor supportsLoadData(org.apache.hadoop.hive.metastore.api.Table tbl, URI fromURI)
+      throws HiveException, TException {
+    if (tbl.getParameters() != null) {
+      String format = tbl.getParameters().get("write.format.default");
+      StorageFormatDescriptor ss = StorageFormat.storageFormatFactory.get(format == null ? "Parquet" : format);
+      Hive db = SessionState.get().getHiveDb();
+      PartitionSpecProxy partitionSpecProxy = db.getMSC()
+          .listPartitionSpecs(tbl.getCatName(), tbl.getDbName(), tbl.getTableName(), Integer.MAX_VALUE);
+      return ss;
+    }
+
+
+    return null;
   }
 
   @Override
   public Map<String, String> getBasicStatistics(Partish partish) {
     org.apache.hadoop.hive.ql.metadata.Table hmsTable = partish.getTable();
     TableDesc tableDesc = Utilities.getTableDesc(hmsTable);
-    Table table = Catalogs.loadTable(conf, tableDesc.getProperties());
+    Table table = IcebergTableUtil.getTable(conf, hmsTable.getTTable());
     String statsSource = HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_USE_STATS_FROM).toLowerCase();
     Map<String, String> stats = Maps.newHashMap();
     switch (statsSource) {

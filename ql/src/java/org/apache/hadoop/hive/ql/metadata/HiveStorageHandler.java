@@ -39,6 +39,7 @@ import org.apache.hadoop.hive.ql.ddl.table.AbstractAlterTableDesc;
 import org.apache.hadoop.hive.ql.ddl.table.AlterTableType;
 import org.apache.hadoop.hive.ql.ddl.table.create.like.CreateTableLikeDesc;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
+import org.apache.hadoop.hive.ql.io.StorageFormatDescriptor;
 import org.apache.hadoop.hive.ql.parse.AlterTableExecuteSpec;
 import org.apache.hadoop.hive.ql.parse.TransformSpec;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -54,6 +55,7 @@ import org.apache.hadoop.hive.serde2.AbstractSerDe;
 import org.apache.hadoop.mapred.InputFormat;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputFormat;
+import org.apache.thrift.TException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -249,8 +251,8 @@ public interface HiveStorageHandler extends Configurable {
    * Check if the storage handler supports load data .
    * @return true if the storage handler can support load data
    */
-  default boolean supportsLoadData() {
-    return false;
+  default StorageFormatDescriptor supportsLoadData(Table parameters, URI fromURI) throws HiveException, TException {
+    return null;
   }
   /**
    * Check if CTAS and CMV operations should behave in a direct-insert manner (i.e. no move task).
