@@ -696,7 +696,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
    * @param hmsTable Table for which we are calculating the properties
    * @return The properties we can provide for Iceberg functions, like {@link Catalogs}
    */
-  private static Properties getCatalogProperties(org.apache.hadoop.hive.metastore.api.Table hmsTable) {
+  public static Properties getCatalogProperties(org.apache.hadoop.hive.metastore.api.Table hmsTable) {
     Properties properties = new Properties();
 
     hmsTable.getParameters().entrySet().stream().filter(e -> e.getKey() != null && e.getValue() != null).forEach(e -> {

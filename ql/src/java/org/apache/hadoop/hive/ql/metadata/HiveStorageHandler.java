@@ -37,6 +37,7 @@ import org.apache.hadoop.hive.metastore.api.LockType;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.ql.Context.Operation;
+import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.table.AbstractAlterTableDesc;
 import org.apache.hadoop.hive.ql.ddl.table.AlterTableType;
 import org.apache.hadoop.hive.ql.ddl.table.create.like.CreateTableLikeDesc;
@@ -287,13 +288,17 @@ public interface HiveStorageHandler extends Configurable {
   }
 
   /**
-   *
    * Check if the storage handler supports load data .
    * @param parameters table properties
+   * @param fromURI
    * @return StorageFormatDescriptor if the storage handler can support load data
    */
-  default StorageFormatDescriptor supportsLoadData(Table parameters) {
-    return null;
+  default StorageFormatDescriptor supportsLoadData(Table parameters, URI fromURI) throws SemanticException {
+    throw new SemanticException(ErrorMsg.LOAD_INTO_NON_NATIVE.getMsg());
+  }
+
+  default void appendFiles(org.apache.hadoop.hive.metastore.api.Table tbl, URI fromURI, boolean isOverwrite) throws HiveException {
+    throw new SemanticException(ErrorMsg.LOAD_INTO_NON_NATIVE.getMsg());
   }
   /**
    * Check if CTAS and CMV operations should behave in a direct-insert manner (i.e. no move task).

@@ -334,13 +334,23 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   }
 
   @Override
-  public StorageFormatDescriptor supportsLoadData(org.apache.hadoop.hive.metastore.api.Table tbl) {
-    if (tbl.getParameters() != null) {
-      String format = tbl.getParameters().get("write.format.default");
+  public StorageFormatDescriptor supportsLoadData(org.apache.hadoop.hive.metastore.api.Table tbl, URI fromURI) {
+    String format = tbl.getParameters().get("write.format.default");
+    Table icebergTbl = IcebergTableUtil.getTable(conf, tbl);
+    if (icebergTbl.spec().isUnpartitioned()) {
+      return null;
+    } else {
       return StorageFormat.getStorageFormatFactory().get(format == null ? IOConstants.PARQUET : format);
     }
-    return null;
   }
+
+  public void appendFiles(org.apache.hadoop.hive.metastore.api.Table table, URI fromURI, boolean isOverwrite)
+      throws HiveException {
+    Table icebergTbl = IcebergTableUtil.getTable(conf, table);
+    String format = table.getParameters().get("write.format.default");
+    HiveTableUtil.appendFiles(fromURI, format == null ? IOConstants.PARQUET : format, icebergTbl, isOverwrite, conf);
+  }
+
 
   @Override
   public Map<String, String> getBasicStatistics(Partish partish) {

@@ -296,14 +296,21 @@ public class LoadSemanticAnalyzer extends SemanticAnalyzer {
     }
     if (ts.tableHandle.isNonNative()) {
       // launch a tez job
-      StorageFormatDescriptor ss = ts.tableHandle.getStorageHandler().supportsLoadData(ts.tableHandle.getTTable());
+      StorageFormatDescriptor ss =
+          ts.tableHandle.getStorageHandler().supportsLoadData(ts.tableHandle.getTTable(), fromURI);
       if (ss != null) {
         inputFormatClassName = ss.getInputFormat();
         serDeClassName = ss.getSerde();
         reparseAndSuperAnalyze(ts.tableHandle, fromURI);
         return;
+      } else {
+        LoadTableDesc loadTableWork = new LoadTableDesc(new Path(fromURI), ts.tableHandle, isOverWrite, true);
+        loadTableWork.setInsertOverwrite(isOverWrite);
+        Task<?> childTask =
+            TaskFactory.get(new MoveWork(getInputs(), getOutputs(), loadTableWork, null, true, isLocal));
+        rootTasks.add(childTask);
+        return;
       }
-      throw new SemanticException(ErrorMsg.LOAD_INTO_NON_NATIVE.getMsg());
     }
 
     if(ts.tableHandle.isStoredAsSubDirectories()) {

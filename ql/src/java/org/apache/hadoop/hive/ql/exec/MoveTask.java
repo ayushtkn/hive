@@ -62,6 +62,7 @@ import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.optimizer.physical.BucketingSortingCtx.BucketCol;
 import org.apache.hadoop.hive.ql.optimizer.physical.BucketingSortingCtx.SortCol;
 import org.apache.hadoop.hive.ql.parse.ExplainConfiguration.AnalyzeState;
+import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.plan.DynamicPartitionCtx;
 import org.apache.hadoop.hive.ql.plan.LoadFileDesc;
 import org.apache.hadoop.hive.ql.plan.LoadMultiFilesDesc;
@@ -348,6 +349,17 @@ public class MoveTask extends Task<MoveWork> implements Serializable {
 
   @Override
   public int execute() {
+    if (work != null && work.getLoadTableWork() != null && work.getLoadTableWork().isIcebergLoad()) {
+      try {
+        work.getLoadTableWork().getMdTable().getStorageHandler()
+            .appendFiles(work.getLoadTableWork().getMdTable().getTTable(),
+                work.getLoadTableWork().getSourcePath().toUri(),
+                work.getLoadTableWork().getLoadFileType() == LoadFileType.REPLACE_ALL);
+        return 0;
+      } catch (HiveException he) {
+        return processHiveException(he);
+      }
+    }
     try {
       initializeFromDeferredContext();
     } catch (HiveException he) {
