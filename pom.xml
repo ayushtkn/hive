@@ -1666,7 +1666,7 @@
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <reuseForks>false</reuseForks>
           <failIfNoTests>false</failIfNoTests>
-          <argLine>${maven.test.jvm.args}</argLine>
+          <argLine>${maven.test.jvm.args} --add-opens java.xml/jdk.xml.internal=ALL-UNNAMED</argLine>
           <trimStackTrace>false</trimStackTrace>
           <additionalClasspathElements>
             <additionalClasspathElement>${test.conf.dir}</additionalClasspathElement>

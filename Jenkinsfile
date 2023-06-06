@@ -85,7 +85,7 @@ sw java 11 && . /etc/profile.d/java.sh
 set -x
 . /etc/profile.d/confs.sh
 export USER="`whoami`"
-export MAVEN_OPTS="-Xmx4g"
+export MAVEN_OPTS="-Xmx5G"
 export -n HIVE_CONF_DIR
 cp $SETTINGS .git/settings.xml
 OPTS=" -s $PWD/.git/settings.xml -B -Dtest.groups= "
