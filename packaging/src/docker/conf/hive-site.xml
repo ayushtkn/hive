@@ -29,6 +29,10 @@
         <value>true</value>
     </property>
     <property>
+        <name>hive.otel.metrics.frequency.seconds</name>
+        <value>2s</value>
+    </property>
+    <property>
         <name>hive.exec.scratchdir</name>
         <value>/opt/hive/scratch_dir</value>
     </property>
