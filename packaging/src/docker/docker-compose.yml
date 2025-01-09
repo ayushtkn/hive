@@ -65,11 +65,6 @@ services:
     environment:
       HIVE_SERVER2_THRIFT_PORT: 10000
       SERVICE_OPTS: '-Xmx1G -Dhive.metastore.uris=thrift://metastore:9083'
-      JAVA_TOOL_OPTIONS: >
-        -Dotel.traces.exporter=otlp 
-        -Dotel.exporter.otlp.endpoint=http://otelcollector:5650 
-        -Dotel.resource.attributes=service.name=Hive-otel
-        -Dotel.java.global-autoconfigure.enabled=true
       IS_RESUME: 'true'
       SERVICE_NAME: 'hiveserver2'
     ports:
