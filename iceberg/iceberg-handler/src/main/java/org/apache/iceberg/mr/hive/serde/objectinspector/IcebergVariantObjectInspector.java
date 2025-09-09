@@ -109,7 +109,7 @@ public final class IcebergVariantObjectInspector extends StructObjectInspector {
 
   @Override
   public String getTypeName() {
-    return "struct<metadata:binary,value:binary>";
+    return "variant";
   }
 
   @Override

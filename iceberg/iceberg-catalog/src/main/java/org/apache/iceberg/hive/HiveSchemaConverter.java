@@ -129,9 +129,6 @@ class HiveSchemaConverter {
         }
       case STRUCT:
         StructTypeInfo structTypeInfo = (StructTypeInfo) typeInfo;
-        if (structTypeInfo.isVariant()) {
-          return Types.VariantType.get();
-        }
         List<Types.NestedField> fields =
             convertInternal(structTypeInfo.getAllStructFieldNames(), structTypeInfo.getAllStructFieldTypeInfos(),
                     Collections.emptyList());
@@ -148,6 +145,8 @@ class HiveSchemaConverter {
         int listId = id++;
         Type listType = convertType(listTypeInfo.getListElementTypeInfo());
         return Types.ListType.ofOptional(listId, listType);
+      case VARIANT:
+        return Types.VariantType.get();
       case UNION:
       default:
         throw new IllegalArgumentException("Unknown type " + typeInfo.getCategory());

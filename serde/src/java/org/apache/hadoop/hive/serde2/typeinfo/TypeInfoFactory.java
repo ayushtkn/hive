@@ -274,4 +274,7 @@ public final class TypeInfoFactory {
     return result;
   }
 
+  public static VariantTypeInfo getVariantTypeInfo() {
+    return new VariantTypeInfo();
+  }
 }

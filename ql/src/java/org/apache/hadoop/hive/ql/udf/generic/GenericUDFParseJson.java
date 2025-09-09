@@ -43,6 +43,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
+import org.apache.hadoop.hive.serde2.typeinfo.VariantTypeInfo;
 
 @Description(name = "parse_json", value = "_FUNC_(json_string) - Parses a JSON string into a VARIANT type", extended = """
     Example:
@@ -64,10 +65,8 @@ public class GenericUDFParseJson extends GenericUDF {
     inputOI = (PrimitiveObjectInspector) arguments[0];
 
     // Return a Variant OI
-    StructTypeInfo struct = (StructTypeInfo) TypeInfoFactory.getStructTypeInfo(Arrays.asList("metadata", "value"),
-        Arrays.asList(TypeInfoFactory.binaryTypeInfo, TypeInfoFactory.binaryTypeInfo));
-    struct.setVariant(true);
-    return TypeInfoUtils.getStandardJavaObjectInspectorFromTypeInfo(struct);
+    VariantTypeInfo variantType = TypeInfoFactory.getVariantTypeInfo();
+    return TypeInfoUtils.getStandardJavaObjectInspectorFromTypeInfo(variantType);
   }
 
   @Override

@@ -505,11 +505,8 @@ public final class TypeInfoUtils {
       }
 
       if (serdeConstants.VARIANT_TYPE_NAME.equals(t.text)) {
-        // Directly return the struct definition for VARIANT
-        StructTypeInfo struct = (StructTypeInfo) TypeInfoFactory.getStructTypeInfo(Arrays.asList("metadata", "value"),
-            Arrays.asList(TypeInfoFactory.binaryTypeInfo, TypeInfoFactory.binaryTypeInfo));
-        struct.setVariant(true);
-        return struct;
+        VariantTypeInfo variant = TypeInfoFactory.getVariantTypeInfo();
+        return variant;
       }
 
       // Is this a list type?
@@ -752,6 +749,11 @@ public final class TypeInfoUtils {
             fieldObjectInspectors);
         break;
       }
+        case VARIANT: {
+          VariantTypeInfo variantTypeInfo = (VariantTypeInfo) typeInfo;
+          result = variantTypeInfo.getObjectInspector();
+          break;
+        }
      default: {
         result = null;
       }
