@@ -1,0 +1,45 @@
+PREHOOK: query: create table t1 (id int, ts timestamp) stored BY ICEBERG STORED AS PARQUET TBLPROPERTIES
+('format-version'='3')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@t1
+POSTHOOK: query: create table t1 (id int, ts timestamp) stored BY ICEBERG STORED AS PARQUET TBLPROPERTIES
+('format-version'='3')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@t1
+PREHOOK: query: create table t2 (id int, ts timestamp) stored BY ICEBERG STORED AS PARQUET TBLPROPERTIES('format-version'='3')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@t2
+POSTHOOK: query: create table t2 (id int, ts timestamp) stored BY ICEBERG STORED AS PARQUET TBLPROPERTIES('format-version'='3')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@t2
+PREHOOK: query: insert into t1 values(1,'2025-12-30 11:19:00.123456789')
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@t1
+POSTHOOK: query: insert into t1 values(1,'2025-12-30 11:19:00.123456789')
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@t1
+PREHOOK: query: insert into t2 values(1,'2025-12-30 11:19:00.123456789')
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@t2
+POSTHOOK: query: insert into t2 values(1,'2025-12-30 11:19:00.123456789')
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@t2
+PREHOOK: query: select * from t1 join t2 where t1.ts=t2.ts
+PREHOOK: type: QUERY
+PREHOOK: Input: default@t1
+PREHOOK: Input: default@t2
+#### A masked pattern was here ####
+POSTHOOK: query: select * from t1 join t2 where t1.ts=t2.ts
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@t1
+POSTHOOK: Input: default@t2
+#### A masked pattern was here ####
+1	2025-12-30 11:19:00.123456	1	2025-12-30 11:19:00.123456
