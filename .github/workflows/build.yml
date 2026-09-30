@@ -19,10 +19,10 @@ name: Build CI with different platforms/configs
 on:
   push:
     branches:
-      - 'master'
+      - '**'
   pull_request:
     branches:
-      - 'master'
+      - '**'
 
 permissions:
   contents: read
